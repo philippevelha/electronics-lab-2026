@@ -5,6 +5,20 @@
 > Write entries as you work, not after the fact.
 
 ---
+### Entry � 2026-11-11
+**Commit reference:** `e83d9cd (HEAD -> main, origin/main, origin/HEAD) [DEBUG] WIP clock process and IDLE transition, not compiling yet`
+
+**What I implemented or decided:**
+Together with my group we started writing the main process of the FSM: a clocked part with the reset and a counter, and the first transition from IDLE to WAIT_PASSWORD when front_sensor = '1'. The code is a work in progress and does not compile yet.
+
+**Why I structured it this way:**
+We wanted to start from the clock and reset, since every other part of the FSM depends on them, and then add the transitions state by state.
+
+**What I am not sure about:**
+Whether the state register and the next-state logic should be in the same process or in separate ones. How the reset should be written to be asynchronous and active low.
+
+**What the simulation or hardware told me I was wrong about:**
+Not compiled or simulated yet.
 
 ### Entry � 2026-11-11
 **Commit reference:** `d34d509`
