@@ -12,6 +12,8 @@
 */ip/
 *_synth_*/
 *_impl_*/
+*.sigasi/
+project.sigasi
 
 # GHDL / ModelSim artifacts
 *.o

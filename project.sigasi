@@ -1,0 +1,10 @@
+{
+    "name": "electronics-lab-2026",
+    "targets": {
+        "rtl": {
+            "libraryMapping": {
+                "": "work"
+            }
+        }
+    }
+}
