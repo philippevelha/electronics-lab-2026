@@ -1,6 +1,6 @@
-# Journal � Exercise 1 � Car Park 1
+# Journal - Exercise 1 - Car Park 1
 
-> **You:** `indigo_turing` � **Group:** `indigo` � **Opened:** 2026-11-11
+> **You:** `indigo_turing` - **Group:** `indigo` - **Opened:** 2026-11-11
 > The code in this folder is shared with your group. **This journal is yours alone.**
 > Write entries as you work, not after the fact.
 
@@ -8,11 +8,11 @@
 
 ## Decision log
 
-### Entry � 2026-11-11
+### Entry - 2026-11-11
 **Commit reference:** `dca582a [TEST]: add skeleton of testbench`
 
 **What I implemented or decided:**
-I helped implement (with the author of this commit) the initial skeleton of the testbench. It is very minimal and doesn't really provide anything yet.
+I helped implement (with the author of this commit) the initial skeleton of the test bench. It is very minimal and doesn't really provide anything yet.
 
 **Why I structured it this way:**
 It's just a skeleton and has no proper structure yet. It should contain the bare minimum needed for the actual development of the test bench.
@@ -24,14 +24,14 @@ Nothing.
 <!-- Leave blank now. Fill in when you find out. Most important field. -->
 
 ---
-### Entry � 2026-11-11
+### Entry - 2026-11-11
 **Commit reference:** `816f55b [IMPL]: add entity`
 
 **What I implemented or decided:**
 Pretty much the same as above. No real functionality is provided and it's just the skeleton of the project.
 
 **Why I structured it this way:**
-This rationale is that it follows the inital specification given by the instructor.
+This rationale is that it follows the initial specification given by the instructor.
 
 **What I am not sure about:**
 Nothing.
@@ -40,7 +40,7 @@ Nothing.
 <!-- Leave blank now. Fill in when you find out. Most important field. -->
 
 ---
-### Entry � 2026-11-11
+### Entry - 2026-11-11
 **Commit reference:** `2ee448c [IMPL]: add state register and initial FSM implementation`
 
 **What I implemented or decided:**
@@ -56,7 +56,7 @@ Nothing.
 <!-- Leave blank now. Fill in when you find out. Most important field. -->
 
 ---
-### Entry � 2026-11-11
+### Entry - 2026-11-11
 **Commit reference:** `7adfd18 [IMPL]: continue implementation of WAIT_PASSWORD state`
 
 **What I implemented or decided:**
