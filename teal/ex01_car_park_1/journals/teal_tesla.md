@@ -1,6 +1,6 @@
-# Journal — Exercise 1 — Car Park 1
+# Journal â€” Exercise 1 â€” Car Park 1
 
-> **You:** `teal_tesla` · **Group:** `teal` · **Opened:** 2026-11-11
+> **You:** `teal_tesla` Â· **Group:** `teal` Â· **Opened:** 2026-11-11
 > The code in this folder is shared with your group. **This journal is yours alone.**
 > Write entries as you work, not after the fact.
 
@@ -8,18 +8,20 @@
 
 ## Decision log
 
-### Entry — 2026-11-11
+### Entry â€” 2026-11-11
 **Commit reference:** `<!-- paste: git log --oneline -1 -->`
 
 **What I implemented or decided:**
-<!-- 2–4 sentences. Be specific about architecture choices. -->
+i've created the VHDL file and commited,
+i've helped on the creation on the FSM and started in local to code
+<!-- 2â€“4 sentences. Be specific about architecture choices. -->
 
 **Why I structured it this way:**
 <!-- What alternatives did you consider? Why did you reject them? -->
-
+  
 **What I am not sure about:**
-<!-- Honest uncertainty. Never graded for correctness — only for presence. -->
-
+<!-- Honest uncertainty. Never graded for correctness â€” only for presence. -->
+the work flow, if it's better to do the TB as the first thing or as last or do it while i code the car_parking_system VHDL
 **What the simulation or hardware told me I was wrong about:**
 <!-- Leave blank now. Fill in when you find out. Most important field. -->
 

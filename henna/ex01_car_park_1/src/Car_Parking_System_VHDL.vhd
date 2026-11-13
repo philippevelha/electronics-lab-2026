@@ -23,9 +23,33 @@ architecture rtl of Car_Parking_System_VHDL is
 
   type state_type is (IDLE, WAIT_PASSWORD, WRONG_PASS, RIGHT_PASS, STOP);
   signal next_state, current_state : state_type;
+  --signal counter : integer range 0 to clock_frequency + 60;     -- 1 min counter 
 
 begin
---  empty for now
+
+    -- working on the clock process (needs to be completed)
+    clock_process : process(clk, reset_n, current_state, front_sensor, back_sensor, password_1, password_2) is
+    begin
+        if rising_edge(clk) then
+            if reset_n = '1' then
+            current_state <= IDLE;
+            wait_counter <= 0;
+            else
+                wait_counter <= wait_counter + 1;
+            end if;
+        end if;
+
+        next_state <= current_state;
+        case current_state is
+            when IDLE =>
+                if front_sensor = '0' then
+                    next_state <= IDLE;
+                elsif front_sensor = '1' and wait_counter < 10 then
+                    next_state <= WAIT_PASSWORD;
+                end if;
+    end process clock_process;
+
+
 end rtl;
 
 
