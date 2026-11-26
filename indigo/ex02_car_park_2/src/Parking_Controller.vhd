@@ -1,3 +1,6 @@
+library ieee;
+  use ieee.std_logic_1164.all;
+
 entity Parking_Controller is
 generic (
 PARKING_CAPACITY : integer := 7
@@ -31,12 +34,14 @@ payment_request : out std_logic;
 barrier_Gin1 : out std_logic; -- '1' = open
 barrier_Gin2 : out std_logic;
 barrier_Gout1 : out std_logic;
+barrier_Gout2 : out std_logic;
 
 -- Visual Indicators
 Green_Light : out std_logic;
 Red_Light : out std_logic;
 display : out std_logic_vector(6 downto 0)
 );
+
 end entity;
 
 architecture Behavioral of Parking_Controller is
@@ -55,16 +60,47 @@ signal state_Gout2, next_state_Gout2 : exit_state_type;
 signal car_count : integer range 0 to PARKING_CAPACITY := 0;
 
 -- Edge detection for sensors
-signal sensor_A_Gin1_prev, sensor_B_Gin1_prev : std_logic;
--- ... (add for other gates)
+signal sensor_A_Gin1_prev, sensor_B_Gin1_prev : std_logic ; 
+signal sensor_A_Gin2_prev, sensor_B_Gin2_prev : std_logic ; 
+signal sensor_A_Gout1_prev, sensor_B_Gout1_prev : std_logic ; 
+signal sensor_A_Gout2_prev, sensor_B_Gout2_prev : std_logic ;
+
 -- Increment/decrement flags
 signal inc_Gin1, inc_Gin2 : std_logic;
 signal dec_Gout1, dec_Gout2 : std_logic;
 
 -- Payment signals
+signal payment_request_Gout1, payment_request_Gout2 : std_logic;
 signal payment_accepted_Gout1, payment_accepted_Gout2 : std_logic;
+
+function int_to_7seg(value : integer) return std_logic_vector is
+    variable result : std_logic_vector(6 downto 0);
+    begin
+    case value is
+    when 0 => result := "0000001"; -- Display '0'
+    when 1 => result := "1001111"; -- Display '1'
+    when 2 => result := "0010010"; -- Display '2'
+    when 3 => result := "0000110"; -- Display '3'
+    when 4 => result := "1001100"; -- Display '4'
+    when 5 => result := "0100100"; -- Display '5'
+    when 6 => result := "0100000"; -- Display '6'
+    when 7 => result := "0001111"; -- Display '7'
+    when others => result := "1111111"; -- Error
+    end case;
+    return result;
+end function;
+    
 begin 
+-- Payment request and payment accepted from either exit gate
+payment_request <= payment_request_Gout1 or payment_request_Gout2;
+payment_accepted <= payment_accepted_Gout1 or payment_accepted_Gout2; 
+ -- Display available spots
+display <= int_to_7seg(PARKING_CAPACITY - car_count);
+-- Control indicator lights
+Green_Light <= '1' when car_count < PARKING_CAPACITY else '0';
+Red_Light <= '1' when car_count = PARKING_CAPACITY else '0';
     stateregister: process(clk, nrst)
+
 begin
 if nrst = '0' then
 -- Reset all states to IDLE
@@ -76,20 +112,24 @@ state_Gout2 <= IDLE;
 -- Reset sensor history
 sensor_A_Gin1_prev <= '0';
 sensor_B_Gin1_prev <= '0';
+sensor_A_Gin2_prev <= '0';
+sensor_B_Gin2_prev <= '0';
+sensor_A_Gout1_prev <= '0';
+sensor_B_Gout1_prev <= '0';
+sensor_A_Gout2_prev <= '0';
+sensor_B_Gout2_prev <= '0';
 
--- ... (reset others)
-4.3 Task 3: Entry Gate State Machines
-Implement the combinational logic for entry gates. Here’s a template for Gin1 (to be
-completed and modified accordingly):
-Make sure to:
-1. Only open barriers when there’s capacity (entry gates)
 elsif rising_edge(clk) then
 -- Update states
 state_Gin1 <= next_state_Gin1;
--- ... (update others)
+state_Gin2 <= next_state_Gin2;
+state_Gout1 <=next_state_Gout1;
+state_Gout2 <=next_state_Gout2;
 -- Store sensor values for edge detection
 sensor_A_Gin1_prev <= sensor_A_Gin1;
--- ... (store others)
+sensor_A_Gin2_prev <= sensor_A_Gin2;
+sensor_A_Gout1_prev <= sensor_A_Gout1;
+sensor_A_Gout2_prev <= sensor_A_Gout2;
 end if;
 end process;
 
@@ -185,24 +225,91 @@ begin
 -- Default values
 next_state_Gout1 <= state_Gout1;
 barrier_Gout1 <= '0';
-payment_request <= '0';
+payment_request_Gout1 <= '0';
 payment_accepted_Gout1 <= '0';
 dec_Gout1 <= '0';
+
 case state_Gout1 is
+
 when IDLE =>
--- TODO: Detect car and check if parking has cars
+if sensor_A_Gout1='1' and car_count > 0 then
+next_state_Gout1 <=WAIT_PAYMENT; 
+end if;
+
 when WAIT_PAYMENT =>
-payment_request <= '1'; -- Turn on payment light
--- TODO: Wait for payment or car to leave
+payment_request_Gout1 <= '1'; -- Turn on payment light
+if sensor_A_Gout1='0' then
+next_state_Gout1 <= WAIT_PAYMENT;
+elsif payment_done='1' then
+next_state_Gout1 <= PAYMENT_OK;
+end if;
+
 when PAYMENT_OK =>
 payment_accepted_Gout1 <= '1';
--- TODO: Wait for car to start exiting
+barrier_Gout1<= '1';
+if sensor_B_Gout1='1' then
+next_state_Gout1 <= CAR_EXITING;
+end if;
+
 when CAR_EXITING =>
 barrier_Gout1 <= '1';
--- TODO: Detect when car fully exits
+if sensor_A_Gout1='0' and sensor_B_Gout1='1' then
+next_state_Gout1 <= CAR_EXITED;
+end if;
+
 when CAR_EXITED =>
 barrier_Gout1 <= '1';
--- TODO: Return to IDLE and decrement counter
+if sensor_B_Gout1 ='0'  then
+next_state_Gout1 <= IDLE;
+dec_Gout1 <='1';
+end if;
+end case;
+end process;
+
+gout2: process(state_Gout2, sensor_A_Gout2, sensor_B_Gout2,
+payment_done, car_count)
+begin
+-- Default values
+next_state_Gout2 <= state_Gout2;
+barrier_Gout2 <= '0';
+payment_request_Gout2 <= '0';
+payment_accepted_Gout2 <= '0';
+dec_Gout2 <= '0';
+
+case state_Gout2 is
+
+when IDLE =>
+if sensor_A_Gout2='1' and car_count > 0 then
+next_state_Gout2 <=WAIT_PAYMENT; 
+end if;
+
+when WAIT_PAYMENT =>
+payment_request_Gout2 <= '1'; -- Turn on payment light
+if sensor_A_Gout2='0' then
+next_state_Gout2 <= WAIT_PAYMENT;
+elsif payment_done='1' then
+next_state_Gout2 <= PAYMENT_OK;
+end if;
+
+when PAYMENT_OK =>
+payment_accepted_Gout2 <= '1';
+barrier_Gout2<= '1';
+if sensor_B_Gout2='1' then
+next_state_Gout2 <= CAR_EXITING;
+end if;
+
+when CAR_EXITING =>
+barrier_Gout2 <= '1';
+if sensor_A_Gout2='0' and sensor_B_Gout2='1' then
+next_state_Gout2 <= CAR_EXITED;
+end if;
+
+when CAR_EXITED =>
+barrier_Gout2 <= '1'; 
+if sensor_B_Gout2 ='0'  then
+next_state_Gout2 <= IDLE;
+dec_Gout2 <='1';
+end if;
 end case;
 end process;
 
@@ -225,27 +332,4 @@ end if;
 end if;
 end process;
 
-function int_to_7seg(value : integer) return std_logic_vector is
-variable result : std_logic_vector(6 downto 0);
-begin
-case value is
-when 0 => result := "0000001"; -- Display '0'
-when 1 => result := "1001111"; -- Display '1'
-when 2 => result := "0010010"; -- Display '2'
-when 3 => result := "0000110"; -- Display '3'
-when 4 => result := "1001100"; -- Display '4'
-when 5 => result := "0100100"; -- Display '5'
-when 6 => result := "0100000"; -- Display '6'
-when 7 => result := "0001111"; -- Display '7'
-when others => result := "1111111"; -- Error
-end case;
-return result;
-end function;
-
--- Display available spots
-display <= int_to_7seg(PARKING_CAPACITY - car_count);
--- Control indicator lights
-Green_Light <= '1' when car_count < PARKING_CAPACITY else '0';
-Red_Light <= '1' when car_count = PARKING_CAPACITY else '0';
--- Payment accepted from either exit gate
-payment_accepted <= payment_accepted_Gout1 or payment_accepted_Gout2;
+end architecture;
